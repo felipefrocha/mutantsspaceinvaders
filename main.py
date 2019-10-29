@@ -106,9 +106,17 @@ while not done:
         rect_change_x = rect_change_x * -1
 
     drawSpaceShip(spaceShipPos)
-    for shot in shotList:
+    shotsToRemove = []
+    for i, shot in enumerate(shotList):
         shot[1] -= 3
-        drawShots()
+        if shot[1] <= 0:
+            shotsToRemove.append(i)
+        else:
+            drawShots()
+    
+    for i in shotsToRemove:
+        del shotList[i]
+    
 
     """
     
