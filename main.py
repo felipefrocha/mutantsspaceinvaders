@@ -6,11 +6,12 @@ import random
 # Constants
 PI = 3.141592653
 # Define some colors
-BLACK = (   0,   0,   0)
-WHITE = ( 255, 255, 255)
-GREEN = (   0, 255,   0)
-RED = ( 255,   0,   0)
-BLUE = (   0,   0, 255)
+BLACK  = (   0,   0,   0)
+WHITE  = ( 255, 255, 255)
+GREEN  = (   0, 255,   0)
+RED    = ( 255,   0,   0)
+BLUE   = (   0,   0, 255)
+YELLOW = ( 255, 255,   0)
 
 # Initialize the src engine
 pygame.init()
@@ -37,18 +38,39 @@ for i in range(50):
     y = random.randrange(0, 500)
     snow_list.append([x, y])
 
+spaceShipPos = 0
+def drawSpaceShip(x):
+    #pygame.draw.polygon(screen, BLUE, [[x, 450], [x + 7, 425], [x + 14, 450]])
+    #pygame.draw.rect(screen, BLUE, [x + 3 , 450 , 3, 5])
+    #pygame.draw.rect(screen, BLUE, [x + 9 , 450 , 3, 5])
+    pygame.draw.polygon(screen, BLUE, [[x - 6, 450], [x + 1, 425], [x + 8, 450]])
+    pygame.draw.rect(screen, BLUE, [x - 2, 450 , 3, 5])
+    pygame.draw.rect(screen, BLUE, [x + 3 , 450 , 3, 5])
+
+shotList = []
+def spaceShipShot(x):
+    shotList.append([x, 415])
+
+def drawShots():
+    for shot in shotList:
+        pygame.draw.rect(screen, YELLOW, [shot[0], shot[1], 2, 6])
+
 # -------- Main Program Loop -----------
+mousePosition = 0
 while not done:
     # --- Main event loop
+    pos = pygame.mouse.get_pos()
+    spaceShipPos = pos[0]
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
         elif event.type == pygame.KEYDOWN:
-            print("User pressed a key.")
+            print("User pressed a KEY")
         elif event.type == pygame.KEYUP:
             print("User let go of a key.")
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            print("User pressed a mouse button")
+            spaceShipShot(pos[0])
  
     # --- Game logic should go here
  
@@ -83,8 +105,12 @@ while not done:
     if rect_x > 650 or rect_x < 0:
         rect_change_x = rect_change_x * -1
 
+    drawSpaceShip(spaceShipPos)
+    for shot in shotList:
+        shot[1] -= 3
+        drawShots()
+
     """
-    pygame.draw.rect(screen, BLUE, [200,250,120,100], 3)
     
     pygame.draw.ellipse(screen, BLACK, [20,20,250,100], 2)
     
