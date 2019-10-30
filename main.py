@@ -16,6 +16,9 @@ YELLOW = ( 255, 255,   0)
 # Initialize the src engine
 pygame.init()
 
+# Hide the mouse cursor
+pygame.mouse.set_visible(False)
+
 size = (700, 500)
 screen = pygame.display.set_mode(size)
 
@@ -40,20 +43,24 @@ for i in range(50):
 
 spaceShipPos = 0
 def drawSpaceShip(x):
-    #pygame.draw.polygon(screen, BLUE, [[x, 450], [x + 7, 425], [x + 14, 450]])
-    #pygame.draw.rect(screen, BLUE, [x + 3 , 450 , 3, 5])
-    #pygame.draw.rect(screen, BLUE, [x + 9 , 450 , 3, 5])
     pygame.draw.polygon(screen, BLUE, [[x - 6, 450], [x + 1, 425], [x + 8, 450]])
     pygame.draw.rect(screen, BLUE, [x - 2, 450 , 3, 5])
     pygame.draw.rect(screen, BLUE, [x + 3 , 450 , 3, 5])
 
+numberOfSuperShots = 1
 shotList = []
 def spaceShipShot(x):
-    shotList.append([x, 415])
+    shotList.append([x, 415, False])
+
+def spaceShipSpecialShot(x):
+    shotList.append([x, 415, True])
 
 def drawShots():
     for shot in shotList:
-        pygame.draw.rect(screen, YELLOW, [shot[0], shot[1], 2, 6])
+        if (shot[2]):
+            pygame.draw.circle(screen, RED, [shot[0], shot[1]], 10)
+        else:
+            pygame.draw.rect(screen, YELLOW, [shot[0], shot[1], 2, 6])
 
 # -------- Main Program Loop -----------
 mousePosition = 0
@@ -66,11 +73,16 @@ while not done:
         if event.type == pygame.QUIT:
             done = True
         elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                if numberOfSuperShots > 0:
+                    spaceShipSpecialShot(pos[0])
+                    numberOfSuperShots -= 1
             print("User pressed a KEY")
         elif event.type == pygame.KEYUP:
             print("User let go of a key.")
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            spaceShipShot(pos[0])
+            if len(shotList) < 3:
+                spaceShipShot(pos[0])
  
     # --- Game logic should go here
  
@@ -117,42 +129,21 @@ while not done:
     for i in shotsToRemove:
         del shotList[i]
     
-
-    """
-    
-    pygame.draw.ellipse(screen, BLACK, [20,20,250,100], 2)
-    
-    pygame.draw.polygon(screen, BLACK, [[100, 100], [0, 200], [200, 200]], 5)
-    
-    y_offset = 0
-    for y_offset in range(0, 100, 20):
-        pygame.draw.line(screen,RED,[0,10+y_offset],[100,110+y_offset],5)
-    
-    for i in range(200):
-        radians_x = i / 20
-        radians_y = i / 6
-        x = int(75 * math.sin(radians_x)) + 200
-        y = int(75 * math.cos(radians_y)) + 200
-        pygame.draw.line(screen, BLACK, [x,y], [x+5,y], 5)
-    
-    # Draw an arc as part of an ellipse. Use radians to determine what
-    # angle to draw.
-    pygame.draw.arc(screen, GREEN, [100,100,250,200],  PI/2,     PI, 2)
-    pygame.draw.arc(screen, BLACK, [100,100,250,200],     0,   PI/2, 2)
-    pygame.draw.arc(screen, RED,   [100,100,250,200],3*PI/2,   2*PI, 2)
-    pygame.draw.arc(screen, BLUE,  [100,100,250,200],    PI, 3*PI/2, 2)
-    """
-
     # Select the font to use, size, bold, italics
-    font = pygame.font.SysFont('Calibri', 25, True, False)
+    fontScore = pygame.font.SysFont('Calibri', 25, True, False)
     # Render the text. "True" means anti-aliased text.
     # Black is the color. The variable BLACK was defined
     # above as a list of [0, 0, 0]
     # Note: This line creates an image of the letters,
     # but does not put it on the screen yet.
-    text = font.render("Score: " + str(0), True, WHITE)
+    text = fontScore.render("Score: " + str(0), True, WHITE)
     # Put the image of the text on the screen at 250x250
     screen.blit(text, [550, 30])
+
+    fontSuperShot = pygame.font.SysFont('Calibri', 18, True, False)
+    text = fontSuperShot.render("Super shot: " + str(numberOfSuperShots), True, WHITE)
+    # Put the image of the text on the screen at 250x250
+    screen.blit(text, [10, 50])
  
     # --- Go ahead and update the screen with what we've drawn.
     pygame.display.flip()
